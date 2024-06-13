@@ -3,8 +3,11 @@
 #return_text_value() function
 #AUthor ID: yzabala@myseneca.ca
 
-import lab3a
-text = lab3a.return_text_value()
-print(text)
-print(lab3a.return_number_value())
+x = {1, 1, 2, 5, 7}
+
+y = {1, 3, 4, 5}
+
+
+
+print(x ^ y)
 
