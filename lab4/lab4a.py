@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Author ID: yzabala-pellicer@myseneca.ca
 
 def join_sets(s1, s2):
     return s1.union(s2)
