@@ -28,12 +28,17 @@ def day_of_week(date: str) -> str:
     return days[num]
 
 def leap_year(year: int) -> bool:
-    "return true if the year is a leap year"
-    ...
+    "Return true if the year is a leap year"
+    return (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0)
 
 def mon_max(month:int, year:int) -> int:
-    "returns the maximum day for a given month. Includes leap year check"
-    ...
+    "Returns the maximum day for a given month. Includes leap year check"
+    if month == 2:
+        return 29 if leap_year(year) else 28
+    elif month in [4, 6, 9, 11]:
+        return 30
+    else:
+        return 31
 
 def after(date: str) -> str: 
     '''
@@ -58,14 +63,14 @@ def after(date: str) -> str:
     lyear = year % 400
     if lyear == 0:
         leap_flag = True  # this is a leap year
-    
+
     mon_dict= {1: 31, 2: 28, 3: 31, 4: 30, 5: 31, 6: 30,
            7: 31, 8: 31, 9: 30, 10: 31, 11: 30, 12: 31}
     if mon == 2 and leap_flag:
         mon_max = 29
     else:
         mon_max = mon_dict[mon]
-    
+
     if day > mon_max:
         mon += 1
         if mon > 12:
@@ -76,7 +81,17 @@ def after(date: str) -> str:
 
 def before(date: str) -> str:
     "Returns previous day's date as DD/MM/YYYY"
-    ...
+    day, mon, year = (int(x) for x in date.split('/'))
+    day -= 1  # previous day
+
+    if day < 1:
+        mon -= 1
+        if mon < 1:
+            year -= 1
+            mon = 12
+        day = mon_max(mon, year)
+    
+    return f"{day:02}/{mon:02}/{year}"
 
 def usage():
     "Print a usage message to the user"
@@ -84,17 +99,35 @@ def usage():
     sys.exit()
 
 def valid_date(date: str) -> bool:
-    "check validity of date"
-    ...
+    "Check validity of date"
+    try:
+        day, mon, year = map(int, date.split('/'))
+        if year < 1 or mon < 1 or mon > 12 or day < 1 or day > mon_max(mon, year):
+            return False
+        return True
+    except ValueError:
+        return False
 
 def day_iter(start_date: str, num: int) -> str:
-    "iterates from start date by num to return end date in DD/MM/YYYY"
-    ...
+    "Iterates from start date by num to return end date in DD/MM/YYYY"
+    current_date = start_date
+    for _ in range(abs(num)):
+        current_date = after(current_date) if num > 0 else before(current_date)
+    return current_date
 
 if __name__ == "__main__":
-    # check length of arguments
-    # check first arg is a valid date
-    # check that second arg is a valid number (+/-)
-    # call day_iter function to get end date, save to x
-    # print(f'The end date is {day_of_week(x)}, {x}.')
-    pass
+    if len(sys.argv) != 3:
+        usage()
+
+    start_date = sys.argv[1]
+    try:
+        num_days = int(sys.argv[2])
+    except ValueError:
+        usage()
+
+    if not valid_date(start_date):
+        usage()
+        sys.exit(1)
+
+    end_date = day_iter(start_date, num_days)
+    print(f'The end date is {day_of_week(end_date)}, {end_date}.')
